@@ -29,6 +29,14 @@ class EmptyMigrationTable(Exception):
     pass
 
 
+class MigrationTableExists(Exception):
+    pass
+
+
+class MigrationTableDoesNotExists(Exception):
+    pass
+
+
 class InvalidMigrationCommand(Exception):
     pass
 
@@ -55,6 +63,9 @@ class AppliedMigration(db.Model):
 
 
 class Column(object):
+    """
+    Class for changes to table columns.
+    """
     def __init__(self, migration, model, column, field_type=None, rename_to_column=None):
         self.migration = migration
         self.model = model
@@ -137,7 +148,6 @@ class BaseMigration(object):
 
 
 class Migration(object):
-
     def __init__(self):
         pass
 
@@ -154,14 +164,14 @@ class Migration(object):
         try:
             AppliedMigration.__table__.create()
         except:
-            print "Failure: Does the migration table already exist?"
+            raise MigrationTableExists("The table you are creating already exists")
 
     def uninit(self):
         AppliedMigration.metadata.bind = db.engine
         try:
             AppliedMigration.__table__.drop()
         except:
-            print "Failure: Did the migration table even exist?"
+            raise MigrationTableDoesNotExists("The table you are trying to drop doesn't exist.")
 
     def create(self, name):
         slug_regex = re.compile('[^a-z0-9_]')
