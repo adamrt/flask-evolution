@@ -293,7 +293,7 @@ class Migrate(object):
         if action == 'create':
             """[name] Create new migration"""
 
-            name = raw_input("Name for the migration")
+            name = raw_input("Name for the migration: ")
             new_file = Migration().create(name)
             print "Created new migration file: %s" % new_file
         else:
