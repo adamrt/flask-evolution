@@ -185,7 +185,7 @@ class Migration(object):
         new_filename = os.path.join(self.migration_path, filename)
 
         with open(new_filename, "w") as f:
-            f.write(self.migration_template())
+            f.write(MIGRATION_TEMPLATE)
 
         return new_filename
 
@@ -260,29 +260,6 @@ class Migration(object):
         print 'Undo: %s' % file_name
         self.migrate_down(klass, am)
 
-    def migration_template(self):
-        return """from flaskext.migrate import BaseMigration, IrreversibleMigration
-from MyProject.models import *
-from MyProject.extensions import db
-
-
-class Migration(BaseMigration):
-    def up(self):
-        db.metadata.bind = db.engine
-        # self.execute("SELECT 1")
-        # self.add_column(MyModel, "column", "integer")
-        # self.drop_column(MyModel, "column")
-        # self.rename_column(MyModel, "column", rename_to_column="renamed")
-        # MyModel.__table__.create()
-        # MyModel.__table__.drop()
-        pass
-
-    def down(self):
-        db.metadata.bind = db.engine
-        raise IrreversibleMigration("down is not defined")
-"""
-
-
 class Evolution(object):
     """
     Simple class to deal with init and the manager function
@@ -312,3 +289,25 @@ class Evolution(object):
             except AttributeError:
                 raise InvalidMigrationCommand("Invalid Option: [init, uninit, create, run, undo, redo]")
             Migration().method()
+
+
+MIGRATION_TEMPLATE = """from flaskext.evolution import BaseMigration, IrreversibleMigration
+from MyProject.models import *
+from MyProject.extensions import db
+
+
+class Migration(BaseMigration):
+    def up(self):
+        db.metadata.bind = db.engine
+        # self.execute("SELECT 1")
+        # self.add_column(MyModel, "column", "integer")
+        # self.drop_column(MyModel, "column")
+        # self.rename_column(MyModel, "column", rename_to_column="renamed")
+        # MyModel.__table__.create()
+        # MyModel.__table__.drop()
+        pass
+
+    def down(self):
+        db.metadata.bind = db.engine
+        raise IrreversibleMigration("down is not defined")
+"""
