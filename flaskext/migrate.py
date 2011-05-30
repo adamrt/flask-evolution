@@ -251,7 +251,7 @@ class Migration(object):
         self.migrate_down(klass, am)
 
     def migration_template(self):
-        return """from migrations import BaseMigration, IrreversibleMigration
+        return """from flaskext.migrate import BaseMigration, IrreversibleMigration
 from MyProject.models import *
 from MyProject.extensions import db
 
