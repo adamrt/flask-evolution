@@ -1,0 +1,30 @@
+## Flask-Migrate ##
+
+Simple migrations for Flask and SQLAlchemy. It was ported from simplemigrations
+by Ricardo Chimal, Jr. and modified for sqlalchemy and to be a flask extension.
+
+## Install ##
+
+1) Standard Python Install
+
+2) Init
+
+    from flaskext.migrate import Migrate
+    _migrate = Migreate()
+    _migrate.init_app(app)
+
+3) Add the manager command to your `Flask-Script` manage.py script like so
+
+    @manager.command
+    def migrate(action):
+        _migrate.manager(action)
+
+
+## USAGE ##
+
+    ./manage.py migrate init          # create the migration table
+    ./manage.py migrate uninit        # drop the migration table
+    ./manage.py migrate create        # Create new migration
+    ./manage.py migrate run           # Run migrations
+    ./manage.py migrate redo          # Redo last migration
+    ./manage.py migrate undo          # Undo last migration
