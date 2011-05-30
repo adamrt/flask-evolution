@@ -29,11 +29,11 @@ class EmptyMigrationTable(Exception):
     pass
 
 
-class MigrationTableExists(Exception):
+class EvolutionAlreadyInitialzed(Exception):
     pass
 
 
-class MigrationTableDoesNotExists(Exception):
+class EvolutionNotInitialized(Exception):
     pass
 
 
@@ -155,23 +155,19 @@ class Migration(object):
     def migration_path(self):
         ctx = _request_ctx_stack.top.app
         path = os.path.join(ctx.root_path, 'migrations')
-        if not os.path.exists(path):
-            os.mkdir(path)
         return path
 
     def init(self):
+        """Create the migrations folder and database table"""
+        path = self.migration_path
+        if not os.path.exists(path):
+            os.mkdir(path)
+
         db.metadata.bind = db.engine
         try:
             AppliedMigration.__table__.create()
         except:
-            raise MigrationTableExists("The migration table already exists")
-
-    def uninit(self):
-        db.metadata.bind = db.engine
-        try:
-            AppliedMigration.__table__.drop()
-        except:
-            raise MigrationTableDoesNotExists("The migration table doesn't exist.")
+            raise EvolutionAlreadyInitialzed("The migrations table already exists")
 
     def create(self, name):
         slug_regex = re.compile('[^a-z0-9_]')
@@ -183,6 +179,8 @@ class Migration(object):
 
         filename = "%04d_%s.py" % (num, name)
         new_filename = os.path.join(self.migration_path, filename)
+        if not os.path.exists(self.migration_path):
+            raise EvolutionNotInitialized("The migrations folder does not exist.")
 
         with open(new_filename, "w") as f:
             f.write(MIGRATION_TEMPLATE)
@@ -260,6 +258,7 @@ class Migration(object):
         print 'Undo: %s' % file_name
         self.migrate_down(klass, am)
 
+
 class Evolution(object):
     """
     Simple class to deal with init and the manager function
@@ -287,7 +286,7 @@ class Evolution(object):
             try:
                 Migration.method = getattr(Migration, action)
             except AttributeError:
-                raise InvalidMigrationCommand("Invalid Option: [init, uninit, create, run, undo, redo]")
+                raise InvalidMigrationCommand("Invalid Option: [init, create, run, undo, redo]")
             Migration().method()
 
 
