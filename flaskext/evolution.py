@@ -160,18 +160,18 @@ class Migration(object):
         return path
 
     def init(self):
-        AppliedMigration.metadata.bind = db.engine
+        db.metadata.bind = db.engine
         try:
             AppliedMigration.__table__.create()
         except:
-            raise MigrationTableExists("The table you are creating already exists")
+            raise MigrationTableExists("The migration table already exists")
 
     def uninit(self):
-        AppliedMigration.metadata.bind = db.engine
+        db.metadata.bind = db.engine
         try:
             AppliedMigration.__table__.drop()
         except:
-            raise MigrationTableDoesNotExists("The table you are trying to drop doesn't exist.")
+            raise MigrationTableDoesNotExists("The migration table doesn't exist.")
 
     def create(self, name):
         slug_regex = re.compile('[^a-z0-9_]')
@@ -283,7 +283,7 @@ class Migration(BaseMigration):
 """
 
 
-class Migrate(object):
+class Evolution(object):
     """
     Simple class to deal with init and the manager function
     """
@@ -310,5 +310,5 @@ class Migrate(object):
             try:
                 Migration.method = getattr(Migration, action)
             except AttributeError:
-                raise InvalidMigrationCommand("Invalid Option: [init, create, run, undo, redo]")
+                raise InvalidMigrationCommand("Invalid Option: [init, uninit, create, run, undo, redo]")
             Migration().method()
