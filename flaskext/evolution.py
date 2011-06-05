@@ -37,10 +37,6 @@ class EvolutionNotInitialized(Exception):
     pass
 
 
-class InvalidMigrationCommand(Exception):
-    pass
-
-
 class AppliedMigration(db.Model):
     """
     The SQLAlchemy Model to keep track of the migrations
@@ -286,7 +282,8 @@ class Evolution(object):
             try:
                 Migration.method = getattr(Migration, action)
             except AttributeError:
-                raise InvalidMigrationCommand("Invalid Option: [init, create, run, undo, redo]")
+                print "Invalid Option: [init, create, run, undo, redo]"
+                return
             Migration().method()
 
 
