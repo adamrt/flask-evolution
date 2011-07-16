@@ -301,7 +301,6 @@ db.metadata.bind = db.engine
 
 class Migration(BaseMigration):
     def up(self):
-        db.metadata.bind = db.engine
         # self.execute("CREATE INDEX column_name_idx ON table_name (column_name ASC NULLS LAST);")
         # self.add_column(MyModel, "column", "integer")
         # self.drop_column(MyModel, "column")
@@ -311,6 +310,5 @@ class Migration(BaseMigration):
         pass
 
     def down(self):
-        db.metadata.bind = db.engine
         raise IrreversibleMigration("down is not defined")
 """
