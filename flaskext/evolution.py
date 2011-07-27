@@ -3,12 +3,14 @@ import datetime
 import os
 import re
 
-from flask import _request_ctx_stack
+
+from flask import _request_ctx_stack, current_app
 from flaskext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
 
 db = SQLAlchemy()
+db.init_app(current_app)
 
 migration_file_regex = re.compile('^(\d+)_([a-z0-9_]+)\.py$')
 
@@ -62,11 +64,11 @@ class Column(object):
     """
     Class for changes to table columns.
     """
-    def __init__(self, migration, model, column, field_type=None, rename_to_column=None):
+    def __init__(self, migration, model, column, field_type=None, rename_column=None):
         self.migration = migration
         self.model = model
         self.column = column
-        self.rename_to_column = rename_to_column
+        self.rename_column = rename_column
         self.field_type = field_type
 
     @property
@@ -75,7 +77,7 @@ class Column(object):
 
     def add(self):
         if not self.field_type:
-            raise InvalidMigration("Adding %s requires field_type" % self.column)
+            raise InvalidMigration("Adding `%s` requires field_type" % self.column)
 
         sql = 'ALTER TABLE "%(table)s" ADD COLUMN %(column)s %(field_type)s' % {
             'table': self.table,
@@ -92,13 +94,13 @@ class Column(object):
         self.migration.execute(sql)
 
     def rename(self):
-        if not self.rename_to_column:
-            raise InvalidMigration("Renaming %s requires rename_to_column" % self.column)
+        if not self.rename_column:
+            raise InvalidMigration("Renaming `%s` requires rename_column" % self.column)
 
-        sql = 'ALTER TABLE "%(table)s" RENAME COLUMN %(column)s TO %(rename_to_column)s' % {
+        sql = 'ALTER TABLE "%(table)s" RENAME COLUMN %(column)s TO %(rename_column)s' % {
             'table': self.table,
             'column': self.column,
-            'rename_to_column': self.rename_to_column,
+            'rename_column': self.rename_column,
             }
         self.migration.execute(sql)
 
@@ -304,7 +306,7 @@ class Migration(BaseMigration):
         # self.execute("CREATE INDEX column_name_idx ON table_name (column_name ASC NULLS LAST);")
         # self.add_column(MyModel, "column", "integer")
         # self.drop_column(MyModel, "column")
-        # self.rename_column(MyModel, "column", rename_to_column="renamed")
+        # self.rename_column(MyModel, "column", rename_column="renamed")
         # MyModel.__table__.create()
         # MyModel.__table__.drop()
         pass
