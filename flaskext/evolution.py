@@ -4,13 +4,12 @@ import os
 import re
 
 
-from flask import _request_ctx_stack, current_app
+from flask import _request_ctx_stack
 from flaskext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
 
 db = SQLAlchemy()
-db.init_app(current_app)
 
 migration_file_regex = re.compile('^(\d+)_([a-z0-9_]+)\.py$')
 
