@@ -1,8 +1,6 @@
-from __future__ import absolute_import
 import datetime
 import os
 import re
-
 
 from flask import _request_ctx_stack
 from flaskext.sqlalchemy import SQLAlchemy
@@ -10,32 +8,7 @@ from sqlalchemy import desc
 
 
 db = SQLAlchemy()
-
 migration_file_regex = re.compile('^(\d+)_([a-z0-9_]+)\.py$')
-
-
-class IrreversibleMigration(Exception):
-    pass
-
-
-class UndefinedMigration(Exception):
-    pass
-
-
-class InvalidMigration(Exception):
-    pass
-
-
-class EmptyMigrationTable(Exception):
-    pass
-
-
-class EvolutionAlreadyInitialzed(Exception):
-    pass
-
-
-class EvolutionNotInitialized(Exception):
-    pass
 
 
 class AppliedMigration(db.Model):
@@ -68,10 +41,10 @@ class BaseMigration(object):
         method()
 
     def up(self):
-        raise UndefinedMigration("up method is undefined")
+        raise Exception("up method is undefined")
 
     def down(self):
-        raise UndefinedMigration("down method is undefined")
+        raise Exception("down method is undefined")
 
     def execute(self, sql, params=None):
         if not params:
@@ -107,10 +80,7 @@ class Migration(object):
             os.mkdir(path)
 
         db.metadata.bind = db.engine
-        try:
-            AppliedMigration.__table__.create()
-        except:
-            raise EvolutionAlreadyInitialzed("The migrations table already exists")
+        AppliedMigration.__table__.create()
 
     def create(self, name):
         slug_regex = re.compile('[^a-z0-9_]')
@@ -123,7 +93,7 @@ class Migration(object):
         filename = "%04d_%s.py" % (num, name)
         new_filename = os.path.join(self.migration_path, filename)
         if not os.path.exists(self.migration_path):
-            raise EvolutionNotInitialized("The migrations folder does not exist.")
+            raise Exception("The migrations folder does not exist.")
 
         with open(new_filename, "w") as f:
             f.write(MIGRATION_TEMPLATE)
@@ -181,7 +151,7 @@ class Migration(object):
     def redo(self):
         am = AppliedMigration.latest()
         if not am:
-            raise InvalidMigration("nothing to redo")
+            raise Exception("no migrations to redo")
         version = am.version
         file_name = self.migration_file(version)
         file_path = os.path.join(self.migration_path, file_name)
