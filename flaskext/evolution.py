@@ -74,15 +74,6 @@ class Migration(object):
         path = os.path.join(ctx.root_path, 'migrations')
         return path
 
-    def init(self):
-        """Create the migrations folder and database table"""
-        path = self.migration_path
-        if not os.path.exists(path):
-            os.mkdir(path)
-
-        db.metadata.bind = db.engine
-        AppliedMigration.__table__.create()
-
     def create(self, name):
         slug_regex = re.compile('[^a-z0-9_]')
 
@@ -129,6 +120,16 @@ class Migration(object):
         return mod
 
     def run(self):
+        """Create the migrations folder if it doesn't exist"""
+        path = self.migration_path
+        if not os.path.exists(path):
+            os.mkdir(path)
+
+        """Create the migrations db table if it doesn't exist"""
+        db.metadata.bind = db.engine
+        if not AppliedMigration.__table__.exists():
+            AppliedMigration.__table__.create()
+
         for t in self.migrations_to_run():
             file_name, version = t
             file_path = os.path.join(self.migration_path, file_name)
@@ -200,7 +201,7 @@ class Evolution(object):
             try:
                 Migration.method = getattr(Migration, action)
             except AttributeError:
-                print "Invalid Option: [init, create, run, undo, redo]"
+                print "Invalid Option: [create, run, undo, redo]"
                 return
             Migration().method()
 
