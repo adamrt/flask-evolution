@@ -9,7 +9,7 @@ from setuptools import setup
 
 setup(
     name='Flask-Evolution',
-    version='0.3',
+    version='0.4',
     url='http://github.com/adamrt/flask-evolution/',
     license='BSD',
     author='Adam Patterson',
