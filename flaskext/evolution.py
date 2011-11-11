@@ -235,23 +235,22 @@ class Evolution(object):
 
 
 MIGRATION_TEMPLATE = """
-from flask import Flask
+import datetime
+from flask import current_app
 from flaskext.evolution import BaseMigration, IrreversibleMigration
 from flaskext.sqlalchemy import SQLAlchemy
-from MYPROJECT.config import DefaultConfig
 
-app = Flask(__name__)
-app.config.from_object(DefaultConfig())
+
+app = current_app
 db = SQLAlchemy(app)
 db.metadata.bind = db.engine
 
 
 class Migration(BaseMigration):
     def up(self):
+        # self.execute("ALTER TABLE table_name ADD COLUMN column_name column_type ;")
+        # self.execute("ALTER TABLE table_name DROP COLUMN column_name;")
         # self.execute("CREATE INDEX column_name_idx ON table_name (column_name ASC NULLS LAST);")
-        # self.add_column(MyModel, "column", "integer")
-        # self.drop_column(MyModel, "column")
-        # self.rename_column(MyModel, "column", rename_column="renamed")
         # MyModel.__table__.create()
         # MyModel.__table__.drop()
         pass
