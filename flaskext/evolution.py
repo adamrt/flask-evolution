@@ -4,7 +4,10 @@ import os
 import re
 
 from flask import _request_ctx_stack
-from flaskext.sqlalchemy import SQLAlchemy
+try:
+    from flaskext.sqlalchemy import SQLAlchemy
+except:
+    from flask.ext.sqlalchemy import SQLAlchemy
 from sqlalchemy import desc
 
 
