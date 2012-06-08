@@ -212,7 +212,7 @@ class Evolution(object):
 MIGRATION_TEMPLATE = """
 import datetime
 from flask import current_app
-from flaskext.evolution import BaseMigration, IrreversibleMigration
+from flaskext.evolution import BaseMigration
 from flaskext.sqlalchemy import SQLAlchemy
 
 
