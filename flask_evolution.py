@@ -3,13 +3,17 @@ import datetime
 import os
 import re
 
-from flask import _request_ctx_stack
+try:
+    from flask import _app_ctx_stack as stack
+except ImportError:
+    from flask import _request_ctx_stack as stack
+
 try:
     from flaskext.sqlalchemy import SQLAlchemy
 except:
     from flask.ext.sqlalchemy import SQLAlchemy
-from sqlalchemy import desc
 
+from sqlalchemy import desc
 
 db = SQLAlchemy()
 migration_file_regex = re.compile('^(\d+)_([a-z0-9_]+)\.py$')
@@ -73,7 +77,7 @@ class Migration(object):
 
     @property
     def migration_path(self):
-        ctx = _request_ctx_stack.top.app
+        ctx = stack.top.app
         path = os.path.join(ctx.root_path, 'migrations')
         return path
 
@@ -212,12 +216,10 @@ class Evolution(object):
 MIGRATION_TEMPLATE = """
 import datetime
 from flask import current_app
-from flaskext.evolution import BaseMigration
-from flaskext.sqlalchemy import SQLAlchemy
+from flask.ext.evolution import BaseMigration
+from flask.ext.sqlalchemy import SQLAlchemy
 
-
-app = current_app
-db = SQLAlchemy(app)
+db = SQLAlchemy(current_app)
 db.metadata.bind = db.engine
 
 

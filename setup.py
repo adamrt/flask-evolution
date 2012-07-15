@@ -9,16 +9,16 @@ from setuptools import setup
 
 setup(
     name='Flask-Evolution',
-    version='0.4',
+    version='0.6',
     url='http://github.com/adamrt/flask-evolution/',
     license='BSD',
     author='Adam Patterson',
-    author_email='fakeempire@gmail.com',
+    author_email='adam@adamrt.com',
     description='Simple migrations for Flask/SQLAlchemy projects',
     long_description=__doc__,
-    packages=['flaskext'],
-    namespace_packages=['flaskext'],
+    py_modules=['flask_evolution'],
     zip_safe=False,
+    include_package_data=True,
     platforms='any',
     install_requires=[
         'Flask',
